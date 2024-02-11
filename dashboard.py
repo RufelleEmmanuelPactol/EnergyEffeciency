@@ -2,6 +2,8 @@ import streamlit as st
 import streamlit as st
 import seaborn as sns
 import matplotlib.pyplot as plt
+# streamlit cache
+
 
 st.markdown('# Activity 1 Dashboard: Cooling Load Prediction With Linear Regression')
 st.markdown("""Cooling load refers to the amount of heat that must be removed from a space or a building to maintain 
@@ -131,50 +133,42 @@ st.markdown("Let's try using multiple values to predict the cooling load. We wil
 # Let's use scikit-learn to train a multi-variable linear regression model
 import numpy as np
 with st.spinner('Training a multi-variable linear regression model...'):
+    import pandas as pd
+    import seaborn as sns
+    import matplotlib.pyplot as plt
     from sklearn.model_selection import train_test_split
     from sklearn.linear_model import LinearRegression
-    from sklearn.metrics import mean_squared_error
+    sns.set(style="darkgrid")  # Set seaborn style to dark to better fit the dark theme
+    plt.rcParams['figure.facecolor'] = '#2E2E2E'  # Outer color
+    plt.rcParams['axes.facecolor'] = '#2E2E2E'  # Axes background color
+    plt.rcParams['savefig.facecolor'] = '#2E2E2E'  # Background color of the saved files
+    plt.rcParams['text.color'] = 'white'  # Setting text color to white for visibility
+    plt.rcParams['axes.labelcolor'] = 'white'
+    plt.rcParams['xtick.color'] = 'white'
+    plt.rcParams['ytick.color'] = 'white'
+
     y_trimmed = y['Cooling Load']
     X_trimmed = X[['Roof Area', 'Surface Area', 'Overall Height', 'Wall Area']]
     X_train, X_test, y_train, y_test = train_test_split(X_trimmed, y_trimmed, test_size=0.2)
+
+    X_train, X_test, y_train, y_test = train_test_split(X_trimmed, y_trimmed, test_size=0.2, random_state=42)
+
     multi_reg = LinearRegression()
     multi_reg.fit(X_train, y_train)
-    y_hat = multi_reg.predict(X_test)
-    st.markdown("### Model Evaluation: Regression Coeffecients")
-    coefficients = multi_reg.coef_
-    features = ['Roof Area', 'Surface Area', 'Overall Height', 'Wall Area']
-    feature_coef_map = {}
-    for i in range(len(features)):
-        feature_coef_map[features[i]] = coefficients[i]
-    coef_df = pd.DataFrame(feature_coef_map, index=['Coefficients'])
-    st.table(coef_df)
-    ## Multiply the x_test values based on their respective coefficients
-    st.markdown("Since our independent variables are a vector, let's calculate for the normalized X value with the following (this collapses them to a singular value, with respect to their coeffecients):")
-    st.latex("\\text{Normalized X =}\sum_{i=1}^{|β|} β_i \;\cdot\;X_i")
-    normalized_X = []
-    # Replace the names with spaces to no spaces
-    X_test = X_test.rename(columns=lambda x: x.replace(' ', '_'))
-    print(X_test.head())
-    for row in X_test.itertuples():
-        normalized_x = 0
-        print(row)
-        normalized_x += feature_coef_map['Roof Area'] * row[0]
-        normalized_x += feature_coef_map['Surface Area'] * row[1]
-        normalized_x += feature_coef_map['Overall Height'] * row[2]
-        normalized_x += feature_coef_map['Wall Area'] * row[3]
-        normalized_X.append(normalized_x)
 
-    st.markdown("### Model Evaluation: Predicted VS. Actual")
-    fig, ax = plt.subplots()
+    y_hat = multi_reg.predict(X_test)
     fig.patch.set_facecolor('#2E2E2E')  # Set the outer color
-    ax.set_facecolor('#2E2E2E')  # Set the graph background color
-    plt.scatter(normalized_X, y_test, label='Actual (y_test)', color='pink')
-    plt.scatter(normalized_X, y_hat, label='Predicted (y_hat)', color='orange')
-    plt.xlabel('Normalized X', color='white')
-    plt.ylabel('Cooling Load', color='white')
-    plt.title('Comparison of Actual and Predicted Values', color='white')
-    plt.tick_params(axis='x', colors='white')  # Set x-axis tick labels to red
-    plt.tick_params(axis='y', colors='white')
-    plt.legend()
+    ax.set_facecolor('#2E2E2E')
+
+
+    X_test_with_predictions = X_test.copy()
+    X_test_with_predictions['Cooling Load Actual'] = y_test
+    X_test_with_predictions['Cooling Load Predicted'] = y_hat
+
+    sns.pairplot(X_test_with_predictions,
+                 diag_kind='kde')
+
     st.pyplot(plt)
+
+
 
