@@ -127,7 +127,7 @@ with st.spinner("Training the linear regression model with the label=`Cooling Lo
     plt.figure()
 
 st.markdown("## Additional Info: Multi-Variable Linear Regression")
-st.markdown("Let's try using multiple values to predict the cooling load. We will use the following features: `Relative Compactness`, `Surface Area`, `Wall Area`, `Roof Area`, `Overall Height`")
+st.markdown("Let's try using multiple values to predict the cooling load. We will use the following features: `Surface Area`, `Wall Area`, `Roof Area`, `Overall Height`")
 # Let's use scikit-learn to train a multi-variable linear regression model
 import numpy as np
 with st.spinner('Training a multi-variable linear regression model...'):
