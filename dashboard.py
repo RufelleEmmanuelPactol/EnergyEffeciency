@@ -138,6 +138,8 @@ with st.spinner('Training a multi-variable linear regression model...'):
     import matplotlib.pyplot as plt
     from sklearn.model_selection import train_test_split
     from sklearn.linear_model import LinearRegression
+
+
     sns.set(style="darkgrid")  # Set seaborn style to dark to better fit the dark theme
     plt.rcParams['figure.facecolor'] = '#2E2E2E'  # Outer color
     plt.rcParams['axes.facecolor'] = '#2E2E2E'  # Axes background color
@@ -155,6 +157,15 @@ with st.spinner('Training a multi-variable linear regression model...'):
 
     multi_reg = LinearRegression()
     multi_reg.fit(X_train, y_train)
+    coef = multi_reg.coef_
+    # create a df out of the coef and intercept
+    stat = {}
+    for i, data in enumerate(['Roof Area', 'Surface Area', 'Overall Height', 'Wall Area']):
+        stat[data] = [coef[i]]
+    coef_df = pd.DataFrame(stat, columns=['Roof Area', 'Surface Area', 'Overall Height', 'Wall Area'], index=['Coefficient'])
+
+    st.markdown('### Coefficients of the Multi-Variable Linear Regression Model')
+    st.table(coef_df)
 
     y_hat = multi_reg.predict(X_test)
     fig.patch.set_facecolor('#2E2E2E')  # Set the outer color
